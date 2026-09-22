@@ -21,17 +21,17 @@ async fn main(_spawner: Spawner) {
     i2c_config.frequency = Hertz(400_000);
 
     // Bind hardware blocks to pins PB6 (SCL) and PB7 (SDA)
-    let i2c_peripheral = I2c::new(
+    let i2c_peripheral = I2c::new_blocking(
         p.I2C1,
         p.PB6,
         p.PB7,
-        Delay,
         i2c_config,
     );
 
     // 3. Initialize MS5611 driver via I2C
     // The driver automatically queries the sensor's factory PROM calibration mathematical models
-    let mut barometer = match Ms5611::new_i2c(i2c_peripheral, Delay) {
+    /// TRUE: High CSB pin (0x76), LOW: CSB low pin (0x77)
+    let mut barometer = match Ms5611::new_i2c(i2c_peripheral, true) {
         Ok(device) => {
             info!("MS561101BA03 Barometer found and calibrated successfully!");
             device
